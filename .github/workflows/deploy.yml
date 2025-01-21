@@ -15,3 +15,13 @@ jobs:
         run: docker build -t lathiya50/simple-ec2-deploy .
       - name: Publish image to docker hub
         run: docker push lathiya50/simple-ec2-deploy:latest
+  deploy:
+    needs: build
+    runs-on: [aws-ec2]
+    steps:
+      - name: Pull image from docker hub
+        run: docker pull lathiya50/simple-ec2-deploy:latest
+      - name: Delete old container
+        run: docker rm -f nodejs-app-container
+      - name: Run docker container
+        run: docker run -d -p 8800:8800 --name nodejs-app-container lathiya50/simple-ec2-deploy

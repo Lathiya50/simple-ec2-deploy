@@ -15,13 +15,28 @@ jobs:
         run: docker build -t lathiya50/simple-ec2-deploy .
       - name: Publish image to docker hub
         run: docker push lathiya50/simple-ec2-deploy:latest
+  
   deploy:
     needs: build
     runs-on: [aws-ec2]
     steps:
+      - name: Install Docker
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y apt-transport-https ca-certificates curl software-properties-common
+          curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+          sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+          sudo apt-get update
+          sudo apt-get install -y docker-ce docker-ce-cli containerd.io
+          sudo usermod -aG docker $USER
+          sudo systemctl start docker
+          sudo systemctl enable docker
+
       - name: Pull image from docker hub
-        run: docker pull lathiya50/simple-ec2-deploy:latest
+        run: sudo docker pull lathiya50/simple-ec2-deploy:latest
+      
       - name: Delete old container
-        run: docker rm -f nodejs-app-container
+        run: sudo docker rm -f nodejs-app-container || true
+      
       - name: Run docker container
-        run: docker run -d -p 8800:8800 --name nodejs-app-container lathiya50/simple-ec2-deploy
+        run: sudo docker run -d -p 8800:8800 --name nodejs-app-container lathiya50/simple-ec2-deploy

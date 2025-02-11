@@ -38,7 +38,7 @@ jobs:
         username: ${{ secrets.AWS_USER }}
         key: ${{ secrets.AWS_KEY }}
         source: "./app.zip"
-        target: "~/node-app"
+        target: "/home/ubuntu/node-app"
         timeout: 120s
         strip_components: 0 
 
